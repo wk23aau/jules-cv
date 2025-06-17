@@ -2,6 +2,7 @@
     'use strict';
 
     $(document).ready(function() {
+        console.log('aicvb_ajax_vars:', aicvb_ajax_vars);
         var $notificationsArea = $('#aicv-user-notifications'); // Cache notification area
         var selectedTemplateId = null;
         var $cvIdField = $('#aicv_cv_id');
