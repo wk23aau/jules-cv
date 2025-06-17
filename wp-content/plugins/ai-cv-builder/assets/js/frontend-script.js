@@ -306,8 +306,7 @@
 
         function saveCvData(isInitialSave = false, callback) {
             console.log('[saveCvData] Called. isInitialSave:', isInitialSave, 'currentCvId:', $cvIdField.val(), 'selectedTemplateId:', selectedTemplateId);
-            var collectedData = collectCvData();
-            var currentCvId = $cvIdField.val();
+            var currentCvId = $cvIdField.val(); // Ensure this is defined before ajaxData
 
             if (!isInitialSave) {
                 clearUserMessages();
@@ -318,17 +317,18 @@
                 action: 'aicvb_save_cv_data',
                 nonce: aicvb_ajax_vars.save_cv_nonce,
                 cv_id: currentCvId,
-                cv_data: collectedData, // Default to full data
-                template_id: selectedTemplateId
+                template_id: selectedTemplateId // Assumes selectedTemplateId is accessible
             };
 
             if (isInitialSave) {
                 ajaxData.cv_data = {
                     personal_info: { full_name: '' },
-                    professional_summary: '' // Set to empty string for consistency
+                    professional_summary: ''
                 };
                 console.log('[saveCvData] isInitialSave=true. ajaxData.cv_data is now minimal:', ajaxData.cv_data);
-                // ajaxData.is_initial_save_test = 'yes'; // Removed as per requirement
+            } else {
+                ajaxData.cv_data = collectCvData();
+                console.log('[saveCvData] isInitialSave=false. ajaxData.cv_data collected from form:', ajaxData.cv_data);
             }
 
             console.log('[saveCvData] Final ajaxData being sent:', JSON.parse(JSON.stringify(ajaxData)));
@@ -356,13 +356,36 @@
                         }
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
+                    console.error('[saveCvData] AJAX Error Details:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText, // Log raw response for all cases
+                        errorThrown: error
+                    });
+                    var responseData = null;
+                    try {
+                        responseData = JSON.parse(xhr.responseText);
+                        console.error('[saveCvData] Parsed server error response:', responseData);
+                    } catch(e) {
+                        console.error('[saveCvData] Server response was not valid JSON. Raw response logged above.');
+                    }
+
                     var errorMsg = 'AJAX error: Could not connect to server for saving.';
-                    if (!isInitialSave) {
+                    if (responseData && responseData.data && responseData.data.message) {
+                        errorMsg = responseData.data.message; // Use server message if available
+                    } else if (xhr.statusText && xhr.status !== 0) { // Check status is not 0 (for aborted requests or network errors)
+                         errorMsg = 'Server Error: ' + xhr.status + ' ' + xhr.statusText;
+                    }
+
+                    if (!isInitialSave) { // Show message in UI only for non-initial saves or if explicitly needed
                         showUserMessage(errorMsg, 'error');
                     }
-                     if (typeof callback === 'function') {
-                        callback(false, { message: errorMsg }, errorMsg);
+
+                    if (typeof callback === 'function') {
+                        // Pass more detailed error info to the callback if appropriate
+                        var callbackErrorData = { message: errorMsg, status: xhr.status, response: responseData || xhr.responseText };
+                        callback(false, callbackErrorData, errorMsg);
                     }
                 },
                 complete: function() {
