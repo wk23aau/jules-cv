@@ -1,0 +1,32 @@
+AI content creation using gemini API flash-2.0
+Wordpress Plugin with shortcode to use on page/post
+
+This document describes an application for creating and editing professional resumes or CVs.
+
+What is this app?
+This application is an intelligent CV and resume builder designed to help users create, customize, and tailor professional-looking resumes with ease. It combines a user-friendly editor with a powerful content generation assistant to streamline the resume-writing process. Users can start from scratch, edit existing information, and stylize the final document to suit their preferences.
+
+What it can do
+Initial CV Generation: The application can create a complete, foundational CV from a simple user input, such as a desired job title or a full job description.
+Content Editing: Users have full control to manually edit every section of the CV, including:
+Personal Information (name, contact details, links)
+Professional Summary
+Work Experience
+Education
+Skills
+Intelligent Content Assistance: The application can automatically generate or suggest content for any part of the resume. For example, it can write a professional summary, create a list of job responsibilities based on a job title, or suggest relevant skills for a particular category.
+Automated CV Tailoring: Users can paste a job description into the application, and it will automatically analyze the user's current CV and suggest modifications to the summary, experience, and skills sections to better align with the specific job requirements.
+Appearance Customization: The visual style of the resume can be fully customized. Users can select from a gallery of predefined themes or fine-tune individual elements such as the primary color scheme and font family.
+Live Preview: A real-time preview of the resume is always visible, instantly updating as the user modifies content or changes the theme.
+PDF Export: Once the resume is complete, it can be downloaded as a high-quality, formatted PDF document, ready for distribution.
+Local Progress Saving: The application automatically saves the user's progress within the browser, allowing them to close the application and resume their work later.
+How it can do it
+The application operates through a simple, interactive process:
+
+Getting Started: A new user is first prompted to provide either a job title or a full job description. The application's intelligent assistant uses this input to generate a complete draft of a resume, populating it with relevant sections and content.
+Editing and Refining: The user is then taken to the main editor, which is split into two primary areas: a control panel and a live preview.
+The Control Panel contains all the tools for editing. The user can switch between a "Content" tab and a "Theme" tab.
+In the Content tab, the user can click into any section (e.g., "Work Experience") to edit text, add new entries, or delete existing ones. For many fields, a "Generate" button is available, which allows the user to ask the built-in assistant to write or improve the text for that specific field.
+In the Theme tab, the user can select from different visual styles or use simple controls like dropdown menus and sliders to change colors and fonts.
+Tailoring for a Job: Within the Content editor, there is a dedicated feature for tailoring. The user can paste a job description into a text box and click a button. The application sends the current resume and the job description to its assistant, which then revises the resume content to better match the keywords and requirements of the role.
+Preview and Download: The Live Preview pane constantly displays the resume exactly as it will appear in the final document. Any change made in the control panel is reflected here instantly. When the user is satisfied, they can click the "Download PDF" button, which converts the live preview into a universally compatible PDF file and saves it to their device.
