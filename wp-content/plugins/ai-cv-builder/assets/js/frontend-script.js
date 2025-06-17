@@ -49,8 +49,9 @@
                 var $resumeSheet = $('#aicv-live-preview .aicv-resume-sheet');
                 $resumeSheet.removeClass().addClass('aicv-resume-sheet theme-default template-' + selectedTemplateId);
 
+                console.log('[TemplateClick] Clicked template. Current cv_id value:', $cvIdField.val(), 'Selected template ID:', $(this).data('template-id'));
                 if (!$cvIdField.val() || $cvIdField.val() === '0') {
-                    // console.log('New CV, performing initial save to get ID...');
+                    console.log('[TemplateClick] Condition for new CV met. Calling saveCvData with isInitialSave = true.');
                     saveCvData(true, function(success, data, message) {
                         if (success && data && data.cv_id) { // Ensure data object and cv_id are present
                             $cvIdField.val(data.cv_id);
@@ -67,7 +68,7 @@
                         }
                     });
                 } else {
-                    // console.log('Existing CV loaded. CV ID:', $cvIdField.val());
+                    console.log('[TemplateClick] Condition for new CV NOT met (likely existing CV). cv_id:', $cvIdField.val());
                 }
             } else {
                 showUserMessage('Could not determine the template ID.', 'error');
@@ -304,6 +305,7 @@
         }
 
         function saveCvData(isInitialSave = false, callback) {
+            console.log('[saveCvData] Called. isInitialSave:', isInitialSave, 'currentCvId:', $cvIdField.val(), 'selectedTemplateId:', selectedTemplateId);
             var collectedData = collectCvData();
             var currentCvId = $cvIdField.val();
 
@@ -325,9 +327,11 @@
                     personal_info: { full_name: '' },
                     professional_summary: '' // Set to empty string for consistency
                 };
+                console.log('[saveCvData] isInitialSave=true. ajaxData.cv_data is now minimal:', ajaxData.cv_data);
                 // ajaxData.is_initial_save_test = 'yes'; // Removed as per requirement
             }
 
+            console.log('[saveCvData] Final ajaxData being sent:', JSON.parse(JSON.stringify(ajaxData)));
             $.ajax({
                 url: aicvb_ajax_vars.ajax_url,
                 type: 'POST',
