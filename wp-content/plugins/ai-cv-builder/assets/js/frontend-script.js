@@ -52,14 +52,18 @@
                 if (!$cvIdField.val() || $cvIdField.val() === '0') {
                     // console.log('New CV, performing initial save to get ID...');
                     saveCvData(true, function(success, data, message) {
-                        if (success && data.cv_id) {
+                        if (success && data && data.cv_id) { // Ensure data object and cv_id are present
                             $cvIdField.val(data.cv_id);
-                            // console.log('Initial save successful. CV ID:', data.cv_id, "Showing AI input modal.");
+                            console.log('CV ID set after initial save:', data.cv_id);
                             $initialInputModal.show();
                         } else {
-                            showUserMessage(message || 'Error: Could not create a new CV. Please try again.', 'error');
-                            $('#aicv-builder-main-ui').hide();
-                            $('#aicv-template-selection-ui').show();
+                            // Display a persistent error message
+                            showUserMessage(message || 'Fatal Error: CV creation failed. The CV could not be saved to the server. Please reload the page and try again. If the problem persists, contact support.', 'error', 0);
+                            // Prevent the #aicv-initial-input-modal from showing (already handled by not calling .show())
+                            // Optional: Consider disabling further save actions or resetting UI further
+                            // For now, the error message is the primary goal.
+                            // $('#aicv-builder-main-ui').hide(); // Optionally hide main UI if it was shown too early
+                            // $('#aicv-template-selection-ui').show(); // Optionally show template selection again
                         }
                     });
                 } else {
@@ -318,11 +322,10 @@
 
             if (isInitialSave) {
                 ajaxData.cv_data = {
-                    professional_summary: 'Initial save test.',
-                    // Optionally, include minimal personal_info if needed by backend for title generation
-                    personal_info: { full_name: '' }
+                    personal_info: { full_name: '' },
+                    professional_summary: '' // Set to empty string for consistency
                 };
-                ajaxData.is_initial_save_test = 'yes';
+                // ajaxData.is_initial_save_test = 'yes'; // Removed as per requirement
             }
 
             $.ajax({

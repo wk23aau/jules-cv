@@ -87,4 +87,46 @@ if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/gemini-api.php' ) ) {
 
 // Initialize the plugin
 // add_action( 'plugins_loaded', array( 'AI_CV_Builder', 'get_instance' ) );
+
+/**
+ * Dequeue jQuery Migrate for the frontend.
+ *
+ * jQuery Migrate is often included by default in WordPress for backward compatibility,
+ * but it's best to ensure all custom JavaScript is up-to-date and remove it.
+ */
+function aicvb_dequeue_jquery_migrate( &$scripts ) {
+    if ( ! is_admin() ) { // Only dequeue for the frontend
+        $jquery_core_handle = 'jquery-core'; // WordPress 5.6+ uses 'jquery-core' for the main jQuery file
+        $jquery_migrate_handle = 'jquery-migrate';
+
+        // Check if jQuery core exists and has jquery-migrate as a dependency
+        if ( isset( $scripts->registered[ $jquery_core_handle ] ) &&
+             isset( $scripts->registered[ $jquery_migrate_handle ] ) ) {
+
+            // Find jquery-migrate in the dependencies of jquery (or jquery-core)
+            $jquery_dependencies = &$scripts->registered[ $jquery_core_handle ]->deps;
+            $migrate_key = array_search( $jquery_migrate_handle, $jquery_dependencies );
+
+            if ( $migrate_key !== false ) {
+                // Remove jquery-migrate from jquery's dependencies
+                unset( $jquery_dependencies[ $migrate_key ] );
+            }
+
+            // Also, explicitly deregister jquery-migrate to be sure
+            // $scripts->remove( $jquery_migrate_handle ); // This might be too aggressive or not work as expected with wp_default_scripts
+            // A gentler way for wp_default_scripts is to nullify its properties
+             if (isset($scripts->registered[$jquery_migrate_handle])) {
+                 $scripts->registered[$jquery_migrate_handle]->src = false;
+                 $scripts->registered[$jquery_migrate_handle]->ver = false;
+                 // If it has its own dependencies that are not needed elsewhere, they might also need handling.
+                 // For jquery-migrate, it usually has no further dependencies.
+             }
+        }
+    }
+}
+// For WordPress versions before 5.5, jquery-migrate might be handled differently.
+// The hook 'wp_default_scripts' is generally robust for modifying default scripts.
+// Using a priority like 11 to run after default scripts are set up.
+add_action( 'wp_default_scripts', 'aicvb_dequeue_jquery_migrate', 11 );
+
 ?>
