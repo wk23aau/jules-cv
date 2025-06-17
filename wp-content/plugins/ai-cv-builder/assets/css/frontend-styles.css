@@ -1,0 +1,349 @@
+/* AI CV Builder Frontend Styles */
+
+.aicv-template-selection {
+    font-family: sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.aicv-template-selection h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.aicv-templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.aicv-template-item {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.aicv-template-item:hover {
+    transform: translateY(-5px);
+}
+
+.aicv-template-preview {
+    height: 200px; /* Adjust as needed */
+    background-color: #e0e0e0; /* Default preview box color */
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    color: #777;
+    font-size: 16px;
+}
+
+/* Specific preview styles (if not using images) */
+.aicv-template-preview-classic {
+    background-color: #d0e4f7; /* Light blue */
+}
+.aicv-template-preview-modern {
+    background-color: #d1f0d1; /* Light green */
+}
+.aicv-template-preview-creative {
+    background-color: #fce8d5; /* Light orange */
+}
+
+.aicv-template-item h3 {
+    font-size: 1.2em;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.aicv-template-item p {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 15px;
+    min-height: 60px; /* Give some consistent height */
+}
+
+.aicv-select-template-button {
+    background-color: #007cba;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.aicv-select-template-button:hover {
+    background-color: #005a87;
+}
+
+/* CV Builder Main UI */
+#aicv-builder-main-ui {
+    display: flex; /* Establishes the two-column layout */
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    height: calc(100vh - 150px); /* Example height, adjust as needed */
+    min-height: 500px;
+    background-color: #fff;
+}
+
+/* Control Panel (Left Pane) */
+#aicv-control-panel {
+    width: 35%; /* Adjust width as needed */
+    min-width: 300px;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    overflow-y: auto; /* Allow scrolling if content overflows */
+    display: flex;
+    flex-direction: column;
+}
+
+.aicv-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.aicv-tabs .aicv-tab-button {
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 16px;
+    color: #555;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.aicv-tabs .aicv-tab-button.active {
+    border-bottom-color: #007cba;
+    color: #007cba;
+    font-weight: bold;
+}
+
+.aicv-tabs .aicv-tab-button:hover:not(.active) {
+    color: #000;
+}
+
+.aicv-tab-pane {
+    /* display: none; */ /* JS handles initial show/hide based on 'active' class and inline style */
+}
+
+.aicv-tab-pane.active {
+    display: block;
+}
+
+.aicv-control-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.aicv-control-section h3 {
+    font-size: 1.1em;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+/* Live Preview (Right Pane) */
+#aicv-live-preview {
+    width: 65%; /* Adjust width as needed */
+    padding: 20px;
+    background-color: #e9e9e9; /* Light gray background for contrast */
+    overflow-y: auto; /* Allow scrolling for resume sheet */
+    display: flex;
+    justify-content: center; /* Center the resume sheet */
+}
+
+.aicv-resume-sheet {
+    width: 100%; /* Or a fixed width like 8.5in for US Letter */
+    max-width: 700px; /* Example max-width */
+    min-height: 800px; /* Example min-height */
+    background-color: #fff;
+    padding: 30px; /* Simulate page margins */
+    box-shadow: 0 0 15px rgba(0,0,0,0.15);
+    border: 1px solid #bbb;
+}
+
+.preview-section {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #eee; /* Light separator for sections */
+}
+.preview-section:last-child {
+    border-bottom: none;
+}
+
+.preview-section h4 {
+    font-size: 1.2em; /* Example size */
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+.preview-section p, .preview-section ul {
+    font-size: 0.9em; /* Example size */
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 5px;
+}
+.preview-section ul {
+    padding-left: 20px;
+}
+
+/* Theme Custom Properties & Base Resume Styles */
+.aicv-resume-sheet {
+    /* Default Custom Properties */
+    --aicv-primary-color: #337ab7; /* Default blue */
+    --aicv-secondary-color: #555555; /* For less prominent elements if needed */
+    --aicv-text-color: #333333;
+    --aicv-background-color: #ffffff;
+    --aicv-font-family: 'Arial', Helvetica, sans-serif;
+    --aicv-heading-font-family: var(--aicv-font-family); /* Can be overridden by themes */
+    --aicv-base-font-size: 16px;
+    --aicv-line-height: 1.6;
+
+    background-color: var(--aicv-background-color);
+    color: var(--aicv-text-color);
+    font-family: var(--aicv-font-family);
+    font-size: var(--aicv-base-font-size);
+    line-height: var(--aicv-line-height);
+}
+
+.aicv-resume-sheet .preview-section h4 {
+    color: var(--aicv-primary-color);
+    font-family: var(--aicv-heading-font-family);
+    font-size: 1.4em; /* Slightly larger */
+    border-bottom: 2px solid var(--aicv-primary-color);
+    padding-bottom: 0.3em;
+    margin-bottom: 0.5em;
+}
+.aicv-resume-sheet #preview_full_name { /* Specific styling for the main name */
+    color: var(--aicv-primary-color);
+    font-family: var(--aicv-heading-font-family);
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 0.1em;
+}
+
+.aicv-resume-sheet .preview-section p,
+.aicv-resume-sheet .preview-section ul {
+    font-family: var(--aicv-font-family);
+    color: var(--aicv-text-color);
+}
+
+/* Basic Theme Style Classes */
+/* Theme Default (already covered by base .aicv-resume-sheet styles with CSS vars) */
+.aicv-resume-sheet.theme-default {
+    /* No specific overrides needed if defaults are set on .aicv-resume-sheet */
+}
+
+/* Theme Classic */
+.aicv-resume-sheet.theme-classic {
+    --aicv-font-family: 'Georgia', serif;
+    --aicv-heading-font-family: 'Times New Roman', Times, serif;
+    --aicv-primary-color: #4a4a4a; /* Dark gray */
+    border: 1px solid #666;
+}
+.aicv-resume-sheet.theme-classic #preview_full_name {
+    text-align: center;
+    border-bottom: 1px solid var(--aicv-text-color);
+    padding-bottom: 0.2em;
+}
+.aicv-resume-sheet.theme-classic .preview-section h4 {
+    text-align: left;
+    border-bottom: 1px solid var(--aicv-primary-color);
+}
+
+
+/* Theme Modern */
+.aicv-resume-sheet.theme-modern {
+    --aicv-font-family: 'Verdana', Geneva, sans-serif;
+    --aicv-primary-color: #007bff; /* Bright blue */
+    --aicv-heading-font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: none;
+}
+.aicv-resume-sheet.theme-modern #preview_full_name {
+    font-size: 2.2em;
+    color: var(--aicv-text-color); /* Primary color might be too much for main name here */
+    padding: 0.2em 0;
+    border-bottom: 3px solid var(--aicv-primary-color);
+}
+.aicv-resume-sheet.theme-modern .preview-section h4 {
+    font-size: 1.3em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    border-left: 4px solid var(--aicv-primary-color);
+    padding-left: 0.5em;
+}
+
+/* Theme Creative */
+.aicv-resume-sheet.theme-creative {
+    --aicv-font-family: '\'Courier New\', Courier, monospace';
+    --aicv-primary-color: #d9534f; /* Bootstrap danger red, as an example */
+    --aicv-heading-font-family: 'Impact', Charcoal, sans-serif;
+    border-left: 5px solid var(--aicv-primary-color);
+    border-right: 5px solid var(--aicv-primary-color);
+    padding: 40px; /* More padding */
+}
+.aicv-resume-sheet.theme-creative #preview_full_name {
+    font-size: 2.5em;
+    letter-spacing: 0.1em;
+    text-shadow: 2px 2px var(--aicv-primary-color);
+    color: #fff; /* White text with colored shadow */
+    background-color: var(--aicv-text-color); /* Dark background for the name */
+    padding: 10px;
+    text-align: center;
+}
+.aicv-resume-sheet.theme-creative .preview-section h4 {
+    font-style: italic;
+    border: none;
+    text-align: right;
+    padding-right: 0.5em;
+    border-bottom: 2px dotted var(--aicv-primary-color);
+}
+
+/* Control panel specific styles for inputs */
+#aicv-tab-theme .aicv-control-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+#aicv-tab-theme .aicv-control-section select,
+#aicv-tab-theme .aicv-control-section input[type="color"] {
+    display: block;
+    width: calc(100% - 22px); /* Account for padding/border */
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+#aicv-tab-theme .aicv-control-section input[type="color"] {
+    height: 40px; /* Make color picker a bit taller */
+    padding: 5px; /* Adjust padding for color picker */
+}
+#aicv-tab-theme .aicv-control-section p.description {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
