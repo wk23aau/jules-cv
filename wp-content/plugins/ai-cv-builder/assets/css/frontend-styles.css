@@ -347,3 +347,291 @@
     margin-top: -5px;
     margin-bottom: 15px;
 }
+
+/* Initial Input Modal Styles */
+.aicv-modal {
+    display: none; /* Hidden by default, shown by JS */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6); /* Dim background */
+}
+
+.aicv-modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* Centered */
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.aicv-modal-content h3 {
+    margin-top: 0;
+    font-size: 1.8em;
+    color: #333;
+}
+
+.aicv-modal-content p {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.aicv-modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+    min-height: 100px;
+}
+
+.aicv-modal-actions button {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 4px;
+    margin: 0 10px;
+}
+.aicv-modal-actions button.button-primary {
+    background-color: #007cba;
+    color: white;
+    border: 1px solid #007cba;
+}
+.aicv-modal-actions button.button-primary:hover {
+    background-color: #005a87;
+}
+.aicv-modal-actions button.button { /* Standard WP button class for "Start Blank" */
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+.aicv-modal-actions button.button:hover {
+    background-color: #e0e0e0;
+}
+
+
+.aicv-modal .aicv-loading-indicator {
+    margin-top: 20px;
+    font-size: 1.1em;
+    color: #555;
+}
+.aicv-modal .aicv-loading-indicator .spinner {
+    display: inline-block; /* Ensure spinner aligns well with text */
+    vertical-align: middle;
+}
+
+/* User Notifications Area */
+#aicv-user-notifications {
+    position: fixed; /* Or relative to a main plugin wrapper if preferred */
+    top: 80px; /* Adjust as needed, consider admin bar */
+    right: 20px;
+    width: 300px;
+    z-index: 9999; /* High z-index to appear above other elements */
+}
+
+#aicv-user-notifications .aicv-message {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    opacity: 0.95;
+    font-size: 0.95em;
+}
+
+#aicv-user-notifications .aicv-message-success {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green */
+    border: 1px solid #c3e6cb;
+}
+
+#aicv-user-notifications .aicv-message-error {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red */
+    border: 1px solid #f5c6cb;
+}
+
+#aicv-user-notifications .aicv-message-info {
+    background-color: #d1ecf1; /* Light blue */
+    color: #0c5460; /* Dark blue */
+    border: 1px solid #bee5eb;
+}
+
+#aicv-user-notifications .aicv-message-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: inherit; /* Inherits color from parent message type */
+    padding: 5px;
+    line-height: 1;
+}
+#aicv-user-notifications .aicv-message-close:hover {
+    opacity: 0.7;
+}
+
+/* Print-Friendly Styles for PDF Export */
+.print-styles-active .aicv-resume-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important; /* Remove any margins around the sheet itself */
+    padding: 0 !important; /* Reset padding if html2pdf handles margins */
+    /* Ensure text is dark and backgrounds are white for printing */
+    /* color: #000 !important; */ /* This might be too aggressive, let CSS vars handle text color */
+    /* background-color: #fff !important; */
+}
+
+/* More specific overrides if needed, e.g. for text colors if they don't use CSS vars properly */
+.print-styles-active .aicv-resume-sheet *,
+.print-styles-active .aicv-resume-sheet *:before,
+.print-styles-active .aicv-resume-sheet *:after {
+    /* color: #000 !important; */ /* Overly aggressive, use with caution */
+    /* background-color: #fff !important; */ /* Can break things like colored headers if not careful */
+    /* box-shadow: none !important; */ /* Remove all shadows */
+    /* text-shadow: none !important; */
+}
+
+/* Hide non-essential UI elements if they were somehow part of the .aicv-resume-sheet (they shouldn't be) */
+.print-styles-active .aicv-builder-main-ui button,
+.print-styles-active #aicv-control-panel { /* Example of hiding other UI if needed */
+    /* display: none !important; */
+}
+
+/* Ensure CSS Variables that control color are set to print-friendly values */
+/* This is often better than blanket !important overrides */
+.print-styles-active .aicv-resume-sheet {
+    --aicv-primary-color: #000000; /* Black for primary elements in print */
+    --aicv-text-color: #000000;    /* Ensure all text is black */
+    --aicv-background-color: #ffffff; /* Ensure background is white */
+    /* Any other color variables should be set to black/white/greyscale or appropriate print color */
+}
+
+/* CV Tailoring Section Styles */
+#aicv-tailoring-controls textarea {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+#aicv_trigger_tailor_cv_button {
+    margin-bottom: 10px; /* Space before spinner if it appears below */
+}
+#aicv_tailoring_spinner {
+    /* Styles for the tailoring spinner, if different from modal's global one */
+    margin-top: 10px;
+    font-size: 1em;
+}
+#aicv_tailoring_spinner .spinner {
+     vertical-align: middle;
+}
+
+
+/* Suggestions Modal Specific Styles */
+.aicv-modal-content-large {
+    max-width: 800px; /* Wider modal for side-by-side comparison */
+}
+
+#aicv-suggestions-container h4 {
+    font-size: 1.3em;
+    color: #333;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+#aicv-suggestions-container h4:first-child {
+    margin-top: 0;
+}
+
+.suggestion-group {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+}
+.suggestion-group strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+.suggestion-group p, .suggestion-group ul { /* Target p or ul for suggestions */
+    margin: 0;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    white-space: pre-wrap; /* Preserve line breaks from AI */
+}
+.suggestion-group ul {
+    padding-left: 25px; /* Indent for lists */
+}
+.suggestion-group ul li {
+    margin-bottom: 5px;
+}
+
+.suggestion-group .original-text { /* Class for original text paragraph/container */
+   /* Optional: specific styling for original text, e.g., slightly muted */
+}
+.suggestion-group .suggested-text { /* Class for suggested text paragraph/container */
+    background-color: #e6ffed; /* Light green highlight for suggestions */
+    border-color: #c3e6cb;
+}
+
+/* Field specific AI Assist spinner */
+.aicv-field-spinner {
+    display: none; /* Hidden by default */
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-left: 5px;
+    background-size: contain; /* Ensure WordPress spinner icon scales correctly */
+}
+.aicv-field-spinner.is-active {
+    display: inline-block;
+}
+
+.aicv-generate-field-button {
+    /* Style similarly to other buttons or make it more subtle */
+    background-color: #6c757d; /* A secondary-like color */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 5px;
+    vertical-align: middle; /* Align with textareas/inputs */
+}
+.aicv-generate-field-button:hover {
+    background-color: #5a6268;
+}
+
+/* Adjust layout for buttons next to textareas if needed */
+#aicv-summary-controls textarea,
+.aicv-experience-entry textarea {
+    width: calc(100% - 120px); /* Adjust width to make space for button if inline */
+    /* Or display button on its own line */
+    display: block; /* Make textarea full width */
+    margin-bottom: 5px; /* Add some space before button */
+}
+#aicv-summary-controls .aicv-generate-field-button,
+.aicv-experience-entry .aicv-generate-field-button {
+     display: inline-block; /* Or block if you prefer full width */
+     margin-top: 5px;
+}
+.aicv-experience-entry .aicv-delete-entry {
+    margin-left: 5px; /* Space it from AI button */
+}

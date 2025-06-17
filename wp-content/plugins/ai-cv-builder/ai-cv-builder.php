@@ -1,4 +1,9 @@
 <?php
+// If this file is called directly, abort.
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * Plugin Name:       AI CV Builder
  * Plugin URI:        https://example.com/ai-cv-builder
