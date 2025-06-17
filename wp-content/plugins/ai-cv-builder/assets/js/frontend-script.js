@@ -5,13 +5,15 @@
         var $notificationsArea = $('#aicv-user-notifications'); // Cache notification area
         var selectedTemplateId = null;
         var $cvIdField = $('#aicv_cv_id');
-        var $saveStatus = $('#aicv-save-status');
+        // var $saveStatus = $('#aicv-save-status'); // No longer used
         var $spinner = $('#aicv-save-spinner');
         var $initialInputModal = $('#aicv-initial-input-modal');
         var $jobDescriptionInput = $('#aicv_job_description_input');
         var $generateInitialCvButton = $('#aicv_generate_initial_cv_button');
         var $skipInitialCvButton = $('#aicv_skip_initial_cv_button');
         var $modalLoadingIndicator = $initialInputModal.find('.aicv-loading-indicator');
+        var $controlPanel = $('#aicv-control-panel');
+
 
         // --- User Message Functions ---
         function clearUserMessages() {
@@ -19,7 +21,6 @@
         }
 
         function showUserMessage(message, type = 'error', duration = 7000) {
-            // clearUserMessages(); // Optional: clear previous messages or allow multiple
             var messageClass = 'aicv-message aicv-message-' + type;
             var $messageDiv = $('<div>').addClass(messageClass).text(message);
             var $closeButton = $('<button>').addClass('aicv-message-close').html('&times;').on('click', function() {
@@ -115,6 +116,10 @@
             // console.log('Skipped AI initial generation.');
         });
 
+        var skillEntryIndex = 1;
+        var educationEntryIndex = 1;
+        var experienceEntryIndex = 1;
+
         function populateFormWithAIData(data) {
             if (!data) return;
 
@@ -122,59 +127,62 @@
                 $('#aicv_summary').val(data.professional_summary).trigger('input');
             }
 
-            // Skills - assuming skills are an array of objects like [{skill_name: '...'}, ...]
             if (data.skills && Array.isArray(data.skills)) {
                 var $skillsContainer = $('#aicv-skills-entries');
-                var $firstSkillEntry = $skillsContainer.find('.aicv-skill-entry:first');
-                $skillsContainer.empty(); // Clear existing (usually one blank)
-
+                var $firstSkillEntryTemplate = $skillsContainer.find('.aicv-skill-entry:first').clone();
+                $skillsContainer.empty();
+                $('#preview-skills-entries').empty();
+                skillEntryIndex = 0;
                 data.skills.forEach(function(skill, index) {
-                    var $newEntry = $firstSkillEntry.clone();
-                    $newEntry.find('input[name$="[skill_name]"]').attr('name', 'aicv_skills[' + index + '][skill_name]').val(skill.skill_name);
+                    var $newEntry = $firstSkillEntryTemplate.clone();
+                    $newEntry.attr('data-entry-index', index);
+                    $newEntry.find('input[name$="[skill_name]"]')
+                             .attr('name', 'aicv_skills[' + index + '][skill_name]')
+                             .attr('id', 'aicv_skill_name_' + index)
+                             .val(skill.skill_name);
                     $skillsContainer.append($newEntry);
-                    // Trigger input for live preview if skills preview is implemented
+                    $('#preview-skills-entries').append(generateSkillPreviewHtml(index, skill));
+                    skillEntryIndex++;
                 });
-                skillEntryIndex = data.skills.length; // Reset index for next manual add
             }
 
-            // Experience - assuming experience is an array of objects
             if (data.experience && Array.isArray(data.experience)) {
                 var $experienceContainer = $('#aicv-experience-entries');
-                var $firstExperienceEntry = $experienceContainer.find('.aicv-experience-entry:first');
+                var $firstExperienceEntryTemplate = $experienceContainer.find('.aicv-experience-entry:first').clone();
                 $experienceContainer.empty();
-
+                $('#preview-experience-entries').empty();
+                experienceEntryIndex = 0;
                 data.experience.forEach(function(exp, index) {
-                    var $newEntry = $firstExperienceEntry.clone();
-                    $newEntry.find('input[name$="[job_title]"]').attr('name', 'aicv_experience[' + index + '][job_title]').val(exp.job_title);
-                    $newEntry.find('input[name$="[company]"]').attr('name', 'aicv_experience[' + index + '][company]').val(exp.company);
-                    $newEntry.find('input[name$="[dates]"]').attr('name', 'aicv_experience[' + index + '][dates]').val(exp.dates);
-                    $newEntry.find('textarea[name$="[description]"]').attr('name', 'aicv_experience[' + index + '][description]').val(exp.description);
+                    var $newEntry = $firstExperienceEntryTemplate.clone();
+                    $newEntry.attr('data-entry-index', index);
+                    $newEntry.find('.aicv-exp-job-title').attr('name', 'aicv_experience[' + index + '][job_title]').val(exp.job_title);
+                    $newEntry.find('.aicv-exp-company').attr('name', 'aicv_experience[' + index + '][company]').val(exp.company);
+                    $newEntry.find('.aicv-exp-dates').attr('name', 'aicv_experience[' + index + '][dates]').val(exp.dates);
+                    $newEntry.find('.aicv-exp-description')
+                             .attr('name', 'aicv_experience[' + index + '][description]')
+                             .attr('id', 'aicv_experience_description_' + index)
+                             .val(exp.description);
                     $experienceContainer.append($newEntry);
-                    // Trigger input for live preview if implemented
+                    $('#preview-experience-entries').append(generateExperiencePreviewHtml(index, exp));
+                    experienceEntryIndex++;
                 });
-                experienceEntryIndex = data.experience.length; // Reset index
             }
-            // Trigger a save after populating form
             saveCvData();
         }
 
-
         // --- Live Preview Updates ---
-        // Personal Info - Targets updated HTML structure
         $controlPanel.on('input', '#aicv_full_name', function() { $('#preview_full_name').text($(this).val() || '[Full Name]'); });
         $controlPanel.on('input', '#aicv_email', function() { $('#preview_email').text($(this).val() || '[Email]'); });
         $controlPanel.on('input', '#aicv_phone', function() { $('#preview_phone').text($(this).val() || '[Phone]'); });
         $controlPanel.on('input', '#aicv_address', function() { $('#preview_address').text($(this).val() || '[Address]'); });
         $controlPanel.on('input', '#aicv_website', function() { $('#preview_website').text($(this).val() || '[Website/LinkedIn]'); });
-        // Summary
         $controlPanel.on('input', '#aicv_summary', function() { $('#preview_summary_content').text($(this).val() || 'Your professional summary here...'); });
 
-        // Function to generate preview for a single experience item
         function generateExperiencePreviewHtml(index, data = {}) {
             var title = escapeHtml(data.job_title || '[Job Title]');
             var company = escapeHtml(data.company || '[Company]');
             var dates = escapeHtml(data.dates || '[Dates]');
-            var description = escapeHtml(data.description || '[Description placeholder]').replace(/\n/g, '<br>'); // Preserve line breaks
+            var description = escapeHtml(data.description || '[Description placeholder]').replace(/\n/g, '<br>');
             return `
                 <div class="preview-experience-item" data-preview-for="exp-${index}">
                     <h4 class="preview-job-title">${title}</h4>
@@ -182,7 +190,6 @@
                     <div class="preview-description">${description}</div>
                 </div>`;
         }
-        // Function to generate preview for a single education item
         function generateEducationPreviewHtml(index, data = {}) {
             var degree = escapeHtml(data.degree || '[Degree]');
             var institution = escapeHtml(data.institution || '[Institution]');
@@ -195,18 +202,15 @@
                     <div class="preview-description">${description}</div>
                 </div>`;
         }
-        // Function to generate preview for a single skill item
         function generateSkillPreviewHtml(index, data = {}) {
             var skillName = escapeHtml(data.skill_name || '[Skill]');
             return `<li class="preview-skill-item" data-preview-for="skill-${index}">${skillName}</li>`;
         }
 
-        // Live update for Experience fields
         $controlPanel.on('input', '#aicv-experience-entries .aicv-experience-entry input, #aicv-experience-entries .aicv-experience-entry textarea', function() {
             var $entry = $(this).closest('.aicv-experience-entry');
-            var index = $entry.data('entry-index'); // Requires data-entry-index on the form entry
+            var index = $entry.data('entry-index');
             var $previewEntry = $('#preview-experience-entries .preview-experience-item[data-preview-for="exp-' + index + '"]');
-
             if ($previewEntry.length) {
                 $previewEntry.find('.preview-job-title').text($entry.find('.aicv-exp-job-title').val() || '[Job Title]');
                 $previewEntry.find('.preview-company').text($entry.find('.aicv-exp-company').val() || '[Company]');
@@ -214,7 +218,6 @@
                 $previewEntry.find('.preview-description').html(escapeHtml($entry.find('.aicv-exp-description').val() || '[Description placeholder]').replace(/\n/g, '<br>'));
             }
         });
-        // Live update for Education fields
          $controlPanel.on('input', '#aicv-education-entries .aicv-education-entry input, #aicv-education-entries .aicv-education-entry textarea', function() {
             var $entry = $(this).closest('.aicv-education-entry');
             var index = $entry.data('entry-index');
@@ -226,7 +229,6 @@
                 $previewEntry.find('.preview-description').html(escapeHtml($entry.find('textarea[name$="[description]"]').val() || '[Description placeholder]').replace(/\n/g, '<br>'));
             }
         });
-        // Live update for Skill fields
         $controlPanel.on('input', '#aicv-skills-entries .aicv-skill-entry input', function() {
             var $entry = $(this).closest('.aicv-skill-entry');
             var index = $entry.data('entry-index');
@@ -236,59 +238,45 @@
             }
         });
 
-
-        // --- Collect CV Data ---
-        function collectCvData() { // Ensure this function is defined before being called by saveCvData
+        function collectCvData() {
             var cvData = {
-                personal_info: { // This structure is for the AICVB_META_PERSONAL_INFO array
+                personal_info: {
                     full_name: $('#aicv_full_name').val(),
                     email: $('#aicv_email').val(),
                     phone: $('#aicv_phone').val(),
                     address: $('#aicv_address').val(),
                     website: $('#aicv_website').val(),
                 },
-                // These are direct meta keys as per PHP handler adjustment
                 professional_summary: $('#aicv_summary').val(),
                 aicv_selected_theme_class: $('#aicv_theme_select').val(),
                 aicv_primary_color: $('#aicv_primary_color').val(),
                 aicv_font_family: $('#aicv_font_family').val(),
-                // Repeatable fields, expect arrays of objects
                 experience: [],
                 education: [],
                 skills: []
             };
 
-            // Collect Experience data
             $('#aicv-experience-entries .aicv-experience-entry').each(function() {
                 var $entry = $(this);
-                // Check if any field in the entry has a value to avoid saving empty objects
                 var hasValue = false;
                 $entry.find('input[type="text"], textarea').each(function() {
-                    if ($(this).val().trim() !== '') {
-                        hasValue = true;
-                        return false; // break loop
-                    }
+                    if ($(this).val().trim() !== '') { hasValue = true; return false; }
                 });
-
                 if(hasValue) {
                     cvData.experience.push({
-                        job_title: $entry.find('input[name$="[job_title]"]').val(),
-                        company: $entry.find('input[name$="[company]"]').val(),
-                        dates: $entry.find('input[name$="[dates]"]').val(),
-                        description: $entry.find('textarea[name$="[description]"]').val()
+                        job_title: $entry.find('.aicv-exp-job-title').val(),
+                        company: $entry.find('.aicv-exp-company').val(),
+                        dates: $entry.find('.aicv-exp-dates').val(),
+                        description: $entry.find('.aicv-exp-description').val()
                     });
                 }
             });
 
-            // Collect Education data
             $('#aicv-education-entries .aicv-education-entry').each(function() {
                 var $entry = $(this);
                 var hasValue = false;
                 $entry.find('input[type="text"], textarea').each(function() {
-                    if ($(this).val().trim() !== '') {
-                        hasValue = true;
-                        return false;
-                    }
+                    if ($(this).val().trim() !== '') { hasValue = true; return false; }
                 });
                 if(hasValue) {
                     cvData.education.push({
@@ -300,31 +288,24 @@
                 }
             });
 
-            // Collect Skills data (array of objects: {skill_name: '...'})
              $('#aicv-skills-entries .aicv-skill-entry').each(function() {
                 var $entry = $(this);
                 var skillName = $entry.find('input[name$="[skill_name]"]').val().trim();
                 if (skillName !== '') {
-                    cvData.skills.push({
-                        skill_name: skillName
-                        // proficiency: $entry.find('input[name$="[proficiency]"]').val() // if proficiency is added
-                    });
+                    cvData.skills.push({ skill_name: skillName });
                 }
             });
-
             return cvData;
         }
 
-        // --- Save CV Data (AJAX) ---
-        function saveCvData(isInitialSave = false, callback) { // Added callback
+        function saveCvData(isInitialSave = false, callback) {
             var collectedData = collectCvData();
             var currentCvId = $cvIdField.val();
 
-            if (!isInitialSave) { // Don't clear messages if it's an initial auto-save in background
+            if (!isInitialSave) {
                 clearUserMessages();
             }
             $spinner.addClass('is-active');
-            // $saveStatus.hide(); // Old system
 
             $.ajax({
                 url: aicvb_ajax_vars.ajax_url,
@@ -342,8 +323,7 @@
                         if (!isInitialSave) {
                            showUserMessage(response.data.message || 'CV Saved!', 'success');
                         } else {
-                           // For initial save, success is handled by the callback (e.g. showing modal)
-                           // console.log('Initial save successful for saveCvData. CV ID:', response.data.cv_id);
+                           // console.log('Initial save successful for saveCvData. CV ID:', response.data.cv_id); // Removed
                         }
                         if (typeof callback === 'function') {
                             callback(true, response.data, response.data.message);
@@ -376,39 +356,132 @@
             saveCvData();
         });
 
-        // --- Repeatable Fields (Basic for Experience) ---
-        var experienceEntryIndex = 1; // Start next index at 1 as 0 is in HTML
-        $('#aicv-add-experience').on('click', function() {
-            var $newEntry = $('#aicv-experience-entries .aicv-experience-entry:first').clone();
-            $newEntry.find('input, textarea').each(function() {
-                var name = $(this).attr('name');
-                if (name) {
-                    name = name.replace(/\[\d+\]/, '[' + experienceEntryIndex + ']');
-                    $(this).attr('name', name).val('');
+        function setupRepeatableSection(section) {
+            var $container = $('#aicv-' + section + '-entries');
+            var $previewContainer = $('#preview-' + section + '-entries');
+            var entryClass = '.aicv-' + section + '-entry';
+            var previewItemClass = '.preview-' + section + '-item';
+            var firstEntryTemplate = $container.find(entryClass + ':first').clone(true);
+            var generatePreviewHtml;
+            var idPrefix;
+            var fieldSelectors = {}; // To map field type to its selector within an entry
+
+            if (section === 'experience') {
+                generatePreviewHtml = generateExperiencePreviewHtml;
+                idPrefix = 'aicv_experience_';
+                fieldSelectors = {
+                    job_title: '.aicv-exp-job-title',
+                    company: '.aicv-exp-company',
+                    dates: '.aicv-exp-dates',
+                    description: '.aicv-exp-description'
+                };
+            } else if (section === 'education') {
+                generatePreviewHtml = generateEducationPreviewHtml;
+                idPrefix = 'aicv_education_';
+                 fieldSelectors = {
+                    degree: 'input[name*="[degree]"]',
+                    institution: 'input[name*="[institution]"]',
+                    dates: 'input[name*="[dates]"]',
+                    description: 'textarea[name*="[description]"]'
+                };
+            } else if (section === 'skills') {
+                generatePreviewHtml = generateSkillPreviewHtml;
+                idPrefix = 'aicv_skill_';
+                fieldSelectors = {
+                    skill_name: 'input[name*="[skill_name]"]'
+                };
+            }
+
+            function updateFieldAttributes($element, newIndex) {
+                var currentName = $element.attr('name');
+                if (currentName) {
+                    $element.attr('name', currentName.replace(/\[\d+\]/, '[' + newIndex + ']'));
+                }
+                var currentId = $element.attr('id');
+                if (currentId) {
+                    // More robust ID replacement, assuming format like prefix_0_field or prefix_0
+                    var newId = currentId.replace(/_\d+(_\w+)?$/, '_' + newIndex + (currentId.match(/(_\w+)$/) ? currentId.match(/(_\w+)$/)[0] : ''));
+                    $element.attr('id', newId);
+                }
+            }
+
+            $container.find(entryClass).each(function(index){
+                $(this).attr('data-entry-index', index);
+                $(this).find('input, textarea').each(function(){
+                    updateFieldAttributes($(this), index);
+                });
+                 // Add initial preview items if form entries exist on page load (e.g. if loading saved data)
+                if ($previewContainer.find('[data-preview-for="' + section.substring(0,3) + '-' + index + '"]').length === 0) {
+                    var initialData = {};
+                    for(var key in fieldSelectors){
+                        initialData[key] = $(this).find(fieldSelectors[key]).val();
+                    }
+                    // Only add if it's not the very first template entry AND it has some value
+                    var hasValue = false;
+                    for(var k in initialData) { if(initialData[k] && initialData[k].trim() !== '') { hasValue=true; break;} }
+
+                    if(index > 0 || hasValue) { // Avoid duplicating placeholder for the first blank entry if it is truly blank
+                       $previewContainer.append(generatePreviewHtml(index, initialData));
+                    } else if (index === 0 && !hasValue && $previewContainer.children().length === 0) {
+                        // For the very first, blank entry, ensure its preview placeholder is there
+                        // This might be redundant if the static HTML already has one.
+                        // $previewContainer.append(generatePreviewHtml(0));
+                    }
                 }
             });
-            $newEntry.appendTo('#aicv-experience-entries');
-            experienceEntryIndex++;
-        });
 
-        $('#aicv-experience-entries').on('click', '.aicv-delete-entry', function() {
-            if ($('#aicv-experience-entries .aicv-experience-entry').length > 1) {
-                $(this).closest('.aicv-experience-entry').remove();
-            } else {
-                alert('At least one entry is required.'); // Or clear the fields
-            }
-        });
 
-        // TODO: Implement similar add/delete for Education and Skills, updating their respective indices.
+            $('#aicv-add-' + section).on('click', function() {
+                var newIndex = $container.find(entryClass).length;
+                var $newEntry = firstEntryTemplate.clone(true);
+                $newEntry.attr('data-entry-index', newIndex);
+                $newEntry.find('input, textarea').each(function() {
+                    $(this).val(''); // Clear values
+                    updateFieldAttributes($(this), newIndex);
+                });
+                $container.append($newEntry);
+                $previewContainer.append(generatePreviewHtml(newIndex));
+                 // Ensure the new entry's fields are properly initialized for live preview
+                var initialData = {};
+                for(var key in fieldSelectors){ initialData[key] = ''; } // empty data for placeholder text
+                var $newPreviewEntry = $previewContainer.find(previewItemClass + '[data-preview-for="' + section.substring(0,3) + '-' + newIndex + '"]');
+                if(section === 'experience' && $newPreviewEntry.length) {
+                    $newPreviewEntry.find('.preview-job-title').text('[Job Title]');
+                    $newPreviewEntry.find('.preview-company').text('[Company]');
+                    $newPreviewEntry.find('.preview-dates').text('[Dates]');
+                    $newPreviewEntry.find('.preview-description').html('[Description placeholder]');
+                } // Add similar for education and skills if needed for more complex placeholders
+            });
+
+            $container.on('click', '.aicv-delete-entry', function() {
+                if ($container.find(entryClass).length > 1) {
+                    var $entryToRemove = $(this).closest(entryClass);
+                    var indexToRemove = $entryToRemove.data('entry-index');
+                    $entryToRemove.remove();
+                    $previewContainer.find(previewItemClass + '[data-preview-for="' + section.substring(0,3) + '-' + indexToRemove + '"]').remove();
+
+                    $container.find(entryClass).each(function(i) {
+                        $(this).attr('data-entry-index', i);
+                        $(this).find('input, textarea').each(function() {
+                            updateFieldAttributes($(this), i);
+                        });
+                    });
+                    $previewContainer.find(previewItemClass).each(function(i) {
+                        $(this).attr('data-preview-for', section.substring(0,3) + '-' + i);
+                    });
+
+                } else {
+                    showUserMessage('At least one entry is required. You can clear the fields if you wish to remove it.', 'info', 4000);
+                }
+            });
+        }
+
+        setupRepeatableSection('experience');
+        setupRepeatableSection('education');
+        setupRepeatableSection('skills');
 
         // --- Theme Customization JS ---
         var $resumeSheet = $('#aicv-live-preview .aicv-resume-sheet');
-
-        // Attach to a parent container that exists on page load for delegated events
-        var $controlPanel = $('#aicv-control-panel');
-
-
-        // Predefined Themes
         $controlPanel.on('change', '#aicv_theme_select', function() {
             var selectedThemeClass = $(this).val();
             $resumeSheet.removeClass (function (index, className) {
@@ -418,13 +491,9 @@
                 $resumeSheet.addClass(selectedThemeClass);
             }
         });
-
-        // Primary Color
         $controlPanel.on('input change', '#aicv_primary_color', function() {
             $resumeSheet.css('--aicv-primary-color', $(this).val());
         });
-
-        // Font Family
         $controlPanel.on('change', '#aicv_font_family', function() {
             $resumeSheet.css('--aicv-font-family', $(this).val());
         });
@@ -434,15 +503,16 @@
             var $button = $(this);
             var $spinner = $button.next('.aicv-field-spinner');
             var fieldType = $button.data('field-type');
-            var targetFieldId = $button.data('target-field'); // For non-repeatable summary
+            var targetFieldIdFromData = $button.data('target-field');
             var $targetTextarea;
             var contextData = {};
             var currentText = '';
+            var effectiveTargetIdForAjax;
 
             if (fieldType === 'summary') {
-                $targetTextarea = $('#' + targetFieldId);
+                $targetTextarea = $('#' + targetFieldIdFromData);
+                effectiveTargetIdForAjax = targetFieldIdFromData;
                 currentText = $targetTextarea.val();
-                // Try to get job title from first experience entry for context
                 var firstJobTitle = $('#aicv-experience-entries .aicv-experience-entry:first .aicv-exp-job-title').val();
                 if (firstJobTitle && firstJobTitle.trim() !== '') {
                     contextData.job_title = firstJobTitle.trim();
@@ -450,17 +520,7 @@
             } else if (fieldType === 'experience_description') {
                 var $experienceEntry = $button.closest('.aicv-experience-entry');
                 $targetTextarea = $experienceEntry.find('.aicv-exp-description');
-                targetFieldId = $targetTextarea.attr('id'); // Ensure ID is set on these textareas if not already
-                if (!targetFieldId) { // Fallback if ID isn't set (though it should be for repeatable fields)
-                    // Create a unique ID if necessary - this part is tricky for dynamic fields
-                    // For now, we assume the textarea can be uniquely identified or has an ID.
-                    // The PHP handler expects 'target_field_id_attr' to be the actual ID.
-                    // Let's ensure our cloning logic for experience entries sets unique IDs on textareas.
-                    // For now, this alert indicates a gap:
-                    // alert("Target textarea for experience description needs a unique ID.");
-                    // return;
-                }
-                targetFieldId = $targetTextarea.attr('id'); // Re-fetch after potential ID assignment
+                effectiveTargetIdForAjax = $targetTextarea.attr('id');
                 currentText = $targetTextarea.val();
                 contextData.job_title = $experienceEntry.find('.aicv-exp-job-title').val();
                 contextData.company = $experienceEntry.find('.aicv-exp-company').val();
@@ -470,14 +530,14 @@
             }
 
             if (!$targetTextarea || !$targetTextarea.length) {
-                console.error('Could not find target textarea for AI Assist. Field Type:', fieldType, 'Target ID attempted:', targetFieldId);
+                console.error('Could not find target textarea for AI Assist. Field Type:', fieldType);
                 return;
             }
-            // If targetFieldId is still undefined for experience (because dynamic ID assignment isn't robust yet),
-            // we need a way to identify it. For now, we'll proceed if $targetTextarea is found.
-            // The PHP response will echo back target_field_id_attr, which JS will use.
-            // For experience, we pass the actual ID of the textarea (which should be made unique on creation).
-            var effectiveTargetIdForAjax = $targetTextarea.attr('id');
+            if (!effectiveTargetIdForAjax && fieldType === 'experience_description') { // Check if ID is missing for repeatable
+                 console.error('Target textarea for experience description needs a unique ID for AI assist.');
+                 showUserMessage('Error: Target field for AI assist could not be identified. Please ensure entries are correctly indexed (try deleting and re-adding the item).', 'error');
+                 return;
+            }
 
             clearUserMessages();
             $spinner.addClass('is-active');
@@ -526,32 +586,29 @@
             });
         });
 
-
-        // --- Tab switching logic for control panel ---
-        $controlPanel.on('click', '.aicv-tabs .aicv-tab-button', function() { // Ensured it's specific to tabs within control panel
+        $controlPanel.on('click', '.aicv-tabs .aicv-tab-button', function() {
             var tabId = $(this).data('tab');
             $controlPanel.find('.aicv-tabs .aicv-tab-button').removeClass('active');
-            $('#aicv-control-panel .aicv-tab-pane').removeClass('active').hide();
+            $controlPanel.find('.aicv-tab-pane').removeClass('active').hide();
             $(this).addClass('active');
-            $('#aicv-tab-' + tabId).addClass('active').show();
+            $controlPanel.find('#aicv-tab-' + tabId).addClass('active').show();
         });
 
-        if ($('#aicv-control-panel .aicv-tab-button.active[data-tab="content"]').length) {
-            $('#aicv-tab-content').show();
-            $('#aicv-tab-theme').hide();
+        if ($controlPanel.find('.aicv-tabs .aicv-tab-button.active[data-tab="content"]').length) {
+            $controlPanel.find('#aicv-tab-content').show();
+            $controlPanel.find('#aicv-tab-theme').hide();
         }
 
-        // --- CV Tailoring Modal Logic ---
         var $tailoringModal = $('#aicv-tailoring-suggestions-modal');
         var $suggestionsContainer = $('#aicv-suggestions-container');
         var $tailoringSpinner = $('#aicv_tailoring_spinner');
-        var currentCvDataForTailoring = null; // To store CV data before suggestions
-        var suggestedCvDataFromAI = null; // To store AI suggestions
+        var currentCvDataForTailoring = null;
+        var suggestedCvDataFromAI = null;
 
         $controlPanel.on('click', '#aicv_trigger_tailor_cv_button', function() {
             var jobDescriptionText = $('#aicv_job_description_for_tailoring').val().trim();
             if (!jobDescriptionText) {
-                alert('Please paste a job description first.');
+                showUserMessage('Please paste a job description first.', 'info', 3000);
                 $('#aicv_job_description_for_tailoring').focus();
                 return;
             }
@@ -592,21 +649,19 @@
         });
 
         function displayTailoringSuggestions() {
-            $suggestionsContainer.empty(); // Clear previous suggestions
+            $suggestionsContainer.empty();
 
             if (!suggestedCvDataFromAI || !currentCvDataForTailoring) {
                 $suggestionsContainer.html('<p>No suggestions available or error in data.</p>');
                 return;
             }
 
-            // Professional Summary
             if (suggestedCvDataFromAI.suggested_professional_summary) {
                 $suggestionsContainer.append('<h4>Professional Summary</h4>');
                 $suggestionsContainer.append('<div class="suggestion-group"><p><strong>Original:</strong></p><p class="original-text">' + escapeHtml(currentCvDataForTailoring.professional_summary || '') + '</p></div>');
                 $suggestionsContainer.append('<div class="suggestion-group"><p><strong>Suggested:</strong></p><p class="suggested-text">' + escapeHtml(suggestedCvDataFromAI.suggested_professional_summary) + '</p></div>');
             }
 
-            // Skills
             if (suggestedCvDataFromAI.suggested_skills && Array.isArray(suggestedCvDataFromAI.suggested_skills)) {
                 $suggestionsContainer.append('<h4>Skills</h4>');
                 var originalSkillsHtml = '<ul>';
@@ -624,13 +679,11 @@
                 $suggestionsContainer.append('<div class="suggestion-group"><p><strong>Suggested:</strong></p><div class="suggested-text">' + suggestedSkillsHtml + '</div></div>');
             }
 
-            // Work Experience
             if (suggestedCvDataFromAI.suggested_work_experience && Array.isArray(suggestedCvDataFromAI.suggested_work_experience)) {
                  $suggestionsContainer.append('<h4>Work Experience</h4>');
                 suggestedCvDataFromAI.suggested_work_experience.forEach(function(suggestedExp, index) {
-                    // Find original experience to compare (simplistic match by original_job_title or index)
                     var originalExp = currentCvDataForTailoring.experience.find(function(exp) { return exp.job_title === suggestedExp.original_job_title; });
-                     if(!originalExp && currentCvDataForTailoring.experience[index]) originalExp = currentCvDataForTailoring.experience[index]; // Fallback to index
+                     if(!originalExp && currentCvDataForTailoring.experience[index]) originalExp = currentCvDataForTailoring.experience[index];
 
                     $suggestionsContainer.append('<h5>' + escapeHtml(suggestedExp.original_job_title || ('Experience Item ' + (index + 1))) + '</h5>');
                     if (originalExp && originalExp.description) {
@@ -661,48 +714,37 @@
                 return;
             }
             clearUserMessages();
-            // Apply Summary
             if (suggestedCvDataFromAI.suggested_professional_summary) {
                 $('#aicv_summary').val(suggestedCvDataFromAI.suggested_professional_summary).trigger('input');
             }
 
-            // Apply Skills
             if (suggestedCvDataFromAI.suggested_skills && Array.isArray(suggestedCvDataFromAI.suggested_skills)) {
                 var $skillsContainer = $('#aicv-skills-entries');
-                var $firstSkillEntryTemplate = $skillsContainer.find('.aicv-skill-entry:first').clone(); // Keep a template
+                var $firstSkillEntryTemplate = $skillsContainer.find('.aicv-skill-entry:first').clone();
                 $skillsContainer.empty();
-                $('#preview-skills-entries').empty(); // Clear skill previews
-                // skillEntryIndex = 0; // Reset index // Not needed if using length
+                $('#preview-skills-entries').empty();
                 suggestedCvDataFromAI.suggested_skills.forEach(function(skillName, i) {
                     var $newEntry = $firstSkillEntryTemplate.clone();
                     $newEntry.attr('data-entry-index', i);
                     $newEntry.find('input[name$="[skill_name]"]').attr('name', 'aicv_skills[' + i + '][skill_name]').val(skillName).attr('id', 'aicv_skill_name_' + i);
                     $skillsContainer.append($newEntry);
                     $('#preview-skills-entries').append(generateSkillPreviewHtml(i, {skill_name: skillName}));
-                    // $newEntry.find('input').trigger('input'); // Trigger preview update for the skill
                 });
             }
 
-            // Apply Work Experience
             if (suggestedCvDataFromAI.suggested_work_experience && Array.isArray(suggestedCvDataFromAI.suggested_work_experience)) {
                 var $experienceContainer = $('#aicv-experience-entries');
                 var $firstExperienceEntryTemplate = $experienceContainer.find('.aicv-experience-entry:first').clone();
-                // For simplicity in "apply", we'll replace all experiences if suggestions exist.
-                // A more complex diff/match could be done but is harder.
                 if (suggestedCvDataFromAI.suggested_work_experience.length > 0) {
                     $experienceContainer.empty();
                     $('#preview-experience-entries').empty();
-                    // experienceEntryIndex = 0; // Not needed
                 }
 
                 suggestedCvDataFromAI.suggested_work_experience.forEach(function(suggestedExp, i) {
                     var $newEntry = $firstExperienceEntryTemplate.clone();
                     $newEntry.attr('data-entry-index', i);
-                    // Find original experience to get other details if needed, or use AI's suggestions primarily
                     var originalExpData = currentCvDataForTailoring.experience.find(function(exp) { return exp.job_title === suggestedExp.original_job_title; });
                      if(!originalExpData && currentCvDataForTailoring.experience[i]) originalExpData = currentCvDataForTailoring.experience[i];
-
-
                     var title = (originalExpData && suggestedExp.original_job_title) ? originalExpData.job_title : (suggestedExp.job_title || '[Job Title]');
                     var company = (originalExpData && suggestedExp.original_job_title) ? originalExpData.company : (suggestedExp.company || '[Company]');
                     var dates = (originalExpData && suggestedExp.original_job_title) ? originalExpData.dates : (suggestedExp.dates || '[Dates]');
@@ -714,23 +756,18 @@
                     $newEntry.find('.aicv-exp-description').attr('name', 'aicv_experience['+i+'][description]').attr('id', 'aicv_experience_description_' + i).val(description);
                     $experienceContainer.append($newEntry);
                     $('#preview-experience-entries').append(generateExperiencePreviewHtml(i, {job_title: title, company: company, dates: dates, description: description}));
-                    // $newEntry.find('input, textarea').trigger('input'); // Trigger preview updates
                 });
             }
 
             $tailoringModal.hide();
-            // Trigger input on all changed fields for live preview (summary already done)
-            // For skills and experience, direct manipulation of preview items is done above.
-            // A general preview refresh function might be better for complex changes.
             showUserMessage('Suggestions applied and CV updated!', 'success');
-            saveCvData(); // Save all applied changes
+            saveCvData();
         });
 
         $tailoringModal.on('click', '#aicv_cancel_suggestions_button', function() {
             $tailoringModal.hide();
         });
 
-        // --- PDF Generation ---
         $('#aicv_download_pdf_button').on('click', function() {
             var $button = $(this);
             var $spinner = $('#aicv-pdf-generating-spinner');
@@ -750,7 +787,6 @@
 
             var cvTitle = $('#preview_full_name').text().trim() || 'resume';
             var filename = cvTitle.replace(/[^a-z0-9_ \-]+/gi, '_').replace(/\s+/g, '_') + '.pdf';
-
 
             const opt = {
                 margin:       [0.5, 0.25, 0.5, 0.25],
@@ -796,3 +832,4 @@
         });
 
     });
+})(jQuery);
