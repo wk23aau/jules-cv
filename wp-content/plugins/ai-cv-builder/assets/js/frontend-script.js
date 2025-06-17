@@ -307,16 +307,27 @@
             }
             $spinner.addClass('is-active');
 
+            var ajaxData = {
+                action: 'aicvb_save_cv_data',
+                nonce: aicvb_ajax_vars.save_cv_nonce,
+                cv_id: currentCvId,
+                cv_data: collectedData, // Default to full data
+                template_id: selectedTemplateId
+            };
+
+            if (isInitialSave) {
+                ajaxData.cv_data = {
+                    professional_summary: 'Initial save test.',
+                    // Optionally, include minimal personal_info if needed by backend for title generation
+                    personal_info: { full_name: '' }
+                };
+                ajaxData.is_initial_save_test = 'yes';
+            }
+
             $.ajax({
                 url: aicvb_ajax_vars.ajax_url,
                 type: 'POST',
-                data: {
-                    action: 'aicvb_save_cv_data',
-                    nonce: aicvb_ajax_vars.save_cv_nonce,
-                    cv_id: currentCvId,
-                    cv_data: collectedData,
-                    template_id: selectedTemplateId
-                },
+                data: ajaxData, // Use the potentially modified ajaxData
                 success: function(response) {
                     if (response.success) {
                         $cvIdField.val(response.data.cv_id);
