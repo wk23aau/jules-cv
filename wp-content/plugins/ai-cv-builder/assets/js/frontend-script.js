@@ -16,6 +16,52 @@
         var $controlPanel = $('#aicv-control-panel');
 
 
+        // --- AJAX Test Function ---
+        console.log("To test AI CV Builder AJAX, run: testAicvbAjax()");
+        window.testAicvbAjax = function() {
+            console.log('[AJAX Test] Sending aicvb_test_action...');
+            var ajaxData = {
+                action: 'aicvb_test_action',
+                // No nonce needed as the test handler doesn't check it.
+                // We could send aicvb_ajax_vars.save_cv_nonce if we wanted to test its availability,
+                // but the goal here is to see if the action handler fires at all.
+                // nonce: aicvb_ajax_vars.save_cv_nonce
+            };
+
+            $.ajax({
+                url: aicvb_ajax_vars.ajax_url,
+                type: 'POST', // Using POST similar to other actions
+                data: ajaxData,
+                success: function(response) {
+                    console.log('[AJAX Test] aicvb_test_action SUCCESS:', response);
+                    if (response && response.success) {
+                        alert('AJAX Test Successful! Server said: ' + response.data.message + ' (PHP v' + response.data.php_version + ')');
+                    } else {
+                        alert('AJAX Test returned success=false or unexpected structure. Check console.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('[AJAX Test] aicvb_test_action FAILED:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        errorThrown: error
+                    });
+                    var responseData = null;
+                    try {
+                        responseData = JSON.parse(xhr.responseText);
+                        console.error('[AJAX Test] Parsed server error for test action:', responseData);
+                        alert('AJAX Test FAILED. Status: ' + xhr.status + '. Parsed Response: ' + JSON.stringify(responseData));
+                    } catch (e) {
+                        console.error('[AJAX Test] Test action response was not valid JSON. Raw response logged above.');
+                        alert('AJAX Test FAILED. Status: ' + xhr.status + '. Raw Response: ' + xhr.responseText);
+                    }
+                }
+            });
+        };
+        // --- End AJAX Test Function ---
+
+
         // --- User Message Functions ---
         function clearUserMessages() {
             $notificationsArea.empty();

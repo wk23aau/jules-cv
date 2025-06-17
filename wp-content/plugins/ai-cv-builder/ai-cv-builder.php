@@ -64,28 +64,31 @@ function ai_cv_builder_uninstall() {
     // Uninstall code here
 }
 
-// Include other necessary files
-if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'admin/admin-settings.php' ) ) {
-    require_once AI_CV_BUILDER_PLUGIN_DIR . 'admin/admin-settings.php';
+// Function to load plugin files
+function aicvb_load_plugin_files() {
+    if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'admin/admin-settings.php' ) ) {
+        require_once AI_CV_BUILDER_PLUGIN_DIR . 'admin/admin-settings.php';
+    }
+    if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/post-types.php' ) ) {
+        require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/post-types.php';
+    }
+    if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/cv-data-functions.php' ) ) {
+        require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/cv-data-functions.php';
+    }
+    if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/shortcodes.php' ) ) {
+        require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/shortcodes.php';
+    }
+    if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/ajax-handlers.php' ) ) {
+        require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/ajax-handlers.php';
+    }
+    if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/gemini-api.php' ) ) {
+        require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/gemini-api.php';
+    }
+    // require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/class-ai-cv-builder.php';
 }
-if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/post-types.php' ) ) {
-    require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/post-types.php';
-}
-if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/cv-data-functions.php' ) ) {
-    require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/cv-data-functions.php';
-}
-if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/shortcodes.php' ) ) {
-    require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/shortcodes.php';
-}
-if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/ajax-handlers.php' ) ) {
-    require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/ajax-handlers.php';
-}
-if ( file_exists( AI_CV_BUILDER_PLUGIN_DIR . 'includes/gemini-api.php' ) ) {
-    require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/gemini-api.php';
-}
-// require_once AI_CV_BUILDER_PLUGIN_DIR . 'includes/class-ai-cv-builder.php';
+add_action( 'plugins_loaded', 'aicvb_load_plugin_files' );
 
-// Initialize the plugin
+// Initialize the plugin - This line can be removed if not used or kept if another class instantiation is planned.
 // add_action( 'plugins_loaded', array( 'AI_CV_Builder', 'get_instance' ) );
 
 /**

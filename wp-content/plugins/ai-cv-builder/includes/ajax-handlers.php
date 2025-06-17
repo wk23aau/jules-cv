@@ -546,4 +546,22 @@ function aicvb_tailor_cv_ajax_handler() {
     wp_send_json_success( array( 'message' => 'Suggestions generated!', 'tailored_suggestions' => $parsed_suggestions ) );
 }
 add_action( 'wp_ajax_aicvb_tailor_cv', 'aicvb_tailor_cv_ajax_handler' );
+
+/**
+ * Simple AJAX handler for testing purposes.
+ */
+function aicvb_test_ajax_handler() {
+    // No nonce check for this simple test
+    // No capability check for this simple test
+    wp_send_json_success(array(
+        'message' => 'AI CV Builder AJAX test successful!',
+        'timestamp' => time(),
+        'php_version' => phpversion()
+    ));
+    // wp_die() is called by wp_send_json_success()
+}
+add_action('wp_ajax_aicvb_test_action', 'aicvb_test_ajax_handler');
+// Optionally, add for non-logged-in users if needed for testing, but typically admin-ajax is for logged-in.
+// add_action('wp_ajax_nopriv_aicvb_test_action', 'aicvb_test_ajax_handler');
+
 ?>
